@@ -40,6 +40,7 @@ THREEx.KeyboardState	= function(domElement)
 	// to store the current state
 	this.keyCodes	= {};
 	this.modifiers	= {};
+	this.running = true;
 	
 	// create callback to bind/unbind keyboard events
 	var _this	= this;
@@ -50,6 +51,36 @@ THREEx.KeyboardState	= function(domElement)
 	this.domElement.addEventListener("keydown", this._onKeyDown, false);
 	this.domElement.addEventListener("keyup", this._onKeyUp, false);
 }
+
+
+/**
+ * To pause listening of the keyboard events
+*/
+THREEx.KeyboardState.prototype.pause    = function()
+{
+
+        if( this.running == true ) {
+                // unbind keyEvents
+                document.removeEventListener("keydown", this._onKeyDown, false);
+                document.removeEventListener("keyup", this._onKeyUp, false);
+                this.keyCodes   = {};
+                this.running = false;
+        } else {
+                document.addEventListener("keydown", this._onKeyDown, false);
+                document.addEventListener("keyup", this._onKeyUp, false);
+                this.running = true;
+        }
+
+};
+
+
+
+
+
+
+
+
+
 
 /**
  * To stop listening of the keyboard events
@@ -100,6 +131,9 @@ THREEx.KeyboardState.prototype._onKeyChange	= function(event)
  * @returns {Boolean} true if the key is pressed, false otherwise
 */
 THREEx.KeyboardState.prototype.pressed	= function(keyDesc){
+	
+	if( !this.running ) return;
+	
 	var keys	= keyDesc.split("+");
 	for(var i = 0; i < keys.length; i++){
 		var key		= keys[i]
